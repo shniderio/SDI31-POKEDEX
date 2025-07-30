@@ -1,16 +1,51 @@
-import PokeCard from "./PokeCard"
+import { Link } from 'react-router-dom';
+import { useState, useEffect } from "react";
+import {
+  Grid,
+  Card,
+  CardMedia,
+  CardActionArea,
+  CardContent,
+  Typography
+} from '@mui/material';
 
-import { useState, useEffect } from "react"
+export default function PokeList({}){
 
-export default function PokeList({setDetails}){
+  const [ pokeData, setPokeData ] = useState([]);
 
-  const [listData, setListData] = useState([])
+  useEffect(() => {
+    fetch(`https://pokeapi.co/api/v2/pokemon?limit=9`)
+    .then(response => response.json())
+    .then(data => {
+      const fetches = data.results.map(pokemon =>
+        fetch(pokemon.url).then(result => result.json())
+      );
+      Promise.all(fetches).then(pokemonDetails => setPokeData(pokemonDetails));
+    })
+  }, []);
 
-    useEffect(() => {
-    fetch('https://pokeapi.co/api/v2/pokemon?limit=9')
-      .then(res=>res.json())
-      .then(data => setListData(data.results))
-  },[])
-
-  return <div>{listData.map(pokemon => <PokeCard key={pokemon.name} poke={pokemon} setDetails={setDetails}/>)}</div>
+  return (
+    <Grid container spacing={2} justifyContent="center" sx={{ mt: 3 }}>
+      {pokeData.map(poke => (
+        <Grid item key={poke.name}>
+          <Card sx={{ maxWidth: 150 }}>
+            <CardActionArea component={Link} to={`/pokemon/${poke.name}`}>
+              <CardMedia
+                component="img"
+                height="140"
+                image={poke.sprites.front_default}
+                alt={poke.name}
+                sx={{ objectFit: 'contain', p: 1 }}
+              />
+              <CardContent>
+                <Typography variant="h6" align="center">
+                  {poke.name}
+                </Typography>
+              </CardContent>
+            </CardActionArea>
+          </Card>
+        </Grid>
+      ))}
+    </Grid>
+  );
 }

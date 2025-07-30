@@ -1,4 +1,5 @@
 import { useEffect,useState } from "react"
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 
 export default function PokeCard({poke, setDetails}){
 
